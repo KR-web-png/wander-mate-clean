@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+// Splash Screen
+import { SplashScreen } from "@/screens/SplashScreen";
+
 // Auth Screens
 import { LoginScreen } from "@/screens/auth/LoginScreen";
 import { SignupScreen } from "@/screens/auth/SignupScreen";
@@ -12,6 +15,7 @@ import { OnboardingScreen } from "@/screens/auth/OnboardingScreen";
 // Main Screens
 import { HomeScreen } from "@/screens/home/HomeScreen";
 import { DiscoverScreen } from "@/screens/discover/DiscoverScreen";
+import { DestinationDetailsScreen } from "@/screens/discover/DestinationDetailsScreen";
 import { TripsScreen } from "@/screens/trips/TripsScreen";
 import { CreateTripScreen } from "@/screens/trips/CreateTripScreen";
 import { MatchesScreen } from "@/screens/matches/MatchesScreen";
@@ -30,15 +34,18 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Splash Screen - First screen */}
+          <Route path="/" element={<SplashScreen />} />
+          
           {/* Auth Routes */}
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/signup" element={<SignupScreen />} />
           <Route path="/onboarding" element={<OnboardingScreen />} />
           
           {/* Main App Routes */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/home" element={<HomeScreen />} />
           <Route path="/discover" element={<DiscoverScreen />} />
+          <Route path="/destination/:id" element={<DestinationDetailsScreen />} />
           <Route path="/trips" element={<TripsScreen />} />
           <Route path="/trips/create" element={<CreateTripScreen />} />
           <Route path="/matches" element={<MatchesScreen />} />

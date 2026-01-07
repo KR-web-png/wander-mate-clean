@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, MapPin, Search, X, Navigation } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
@@ -7,6 +7,8 @@ import { Card } from '@/components/common/Card';
 import { Geolocation } from '@capacitor/geolocation';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
+import { Destination } from '@/models';
+import { mockDestinations } from '@/services/mock.data';
 
 // Declare Leaflet types
 declare global {
@@ -16,29 +18,57 @@ declare global {
   }
 }
 
-// Sri Lanka destination coordinates
-const SRI_LANKA_DESTINATIONS = [
+// Convert mockDestinations to location format for search
+const SRI_LANKA_DESTINATIONS = mockDestinations.map(dest => ({
+  name: dest.name,
+  lat: dest.coordinates.latitude,
+  lng: dest.coordinates.longitude
+}));
+
+// Additional popular destinations not in mockDestinations
+const ADDITIONAL_DESTINATIONS = [
   { name: 'Colombo', lat: 6.9271, lng: 79.8612 },
   { name: 'Kandy', lat: 7.2906, lng: 80.6337 },
-  { name: 'Galle', lat: 6.0535, lng: 80.2210 },
-  { name: 'Sigiriya', lat: 7.9570, lng: 80.7603 },
   { name: 'Nuwara Eliya', lat: 6.9497, lng: 80.7891 },
-  { name: 'Ella', lat: 6.8667, lng: 81.0467 },
   { name: 'Trincomalee', lat: 8.5874, lng: 81.2152 },
   { name: 'Jaffna', lat: 9.6615, lng: 80.0255 },
-  { name: 'Anuradhapura', lat: 8.3114, lng: 80.4037 },
-  { name: 'Polonnaruwa', lat: 7.9403, lng: 81.0188 },
   { name: 'Bentota', lat: 6.4264, lng: 79.9951 },
-  { name: 'Mirissa', lat: 5.9467, lng: 80.4589 },
   { name: 'Arugam Bay', lat: 6.8408, lng: 81.8364 },
-  { name: 'Dambulla', lat: 7.8606, lng: 80.6518 },
   { name: 'Negombo', lat: 7.2084, lng: 79.8358 },
   { name: 'Hikkaduwa', lat: 6.1409, lng: 80.1028 },
   { name: 'Yala National Park', lat: 6.3714, lng: 81.5169 },
   { name: 'Unawatuna', lat: 6.0094, lng: 80.2503 },
   { name: 'Matara', lat: 5.9549, lng: 80.5550 },
   { name: 'Tangalle', lat: 6.0234, lng: 80.7961 },
+  { name: 'Gampola', lat: 7.1644, lng: 80.5770 },
+  { name: 'Gal Oya National Park', lat: 7.2364, lng: 81.3469 },
+  { name: 'Knuckles Mountain Range', lat: 7.4500, lng: 80.7833 },
+  { name: 'Pigeon Island', lat: 8.7167, lng: 81.2167 },
+  { name: 'Ratnapura', lat: 6.6828, lng: 80.4003 },
+  { name: 'Bundala National Park', lat: 6.1914, lng: 81.2039 },
+  { name: 'Sinharaja Rainforest', lat: 6.4014, lng: 80.4008 },
+  { name: 'Wilpattu National Park', lat: 8.4833, lng: 80.0333 },
+  { name: 'Udawalawe National Park', lat: 6.4833, lng: 80.8833 },
+  { name: 'Minneriya', lat: 8.0333, lng: 80.9000 },
+  { name: 'Pasikudah', lat: 7.9333, lng: 81.5667 },
+  { name: 'Kalkudah', lat: 7.9167, lng: 81.5500 },
+  { name: 'Weligama', lat: 5.9667, lng: 80.4333 },
+  { name: 'Hiriketiya', lat: 5.9833, lng: 80.7000 },
+  { name: 'Ahangama', lat: 5.9667, lng: 80.3667 },
+  { name: 'Kalpitiya', lat: 8.2333, lng: 79.7667 },
+  { name: 'Kitulgala', lat: 6.9889, lng: 80.4186 },
+  { name: 'Hatton', lat: 6.8917, lng: 80.5972 },
+  { name: 'Haputale', lat: 6.7667, lng: 80.9667 },
+  { name: 'Horton Plains', lat: 6.8167, lng: 80.8000 },
+  { name: "Adam's Peak", lat: 6.8094, lng: 80.4994 },
+  { name: 'Dambulla Cave Temple', lat: 7.8606, lng: 80.6518 },
+  { name: 'Temple of the Tooth', lat: 7.2935, lng: 80.6405 },
+  { name: 'Mihintale', lat: 8.3511, lng: 80.5039 },
+  { name: 'Yapahuwa', lat: 7.8333, lng: 80.3667 },
 ];
+
+// Combine both lists
+const ALL_DESTINATIONS = [...SRI_LANKA_DESTINATIONS, ...ADDITIONAL_DESTINATIONS];
 
 // Sri Lanka bounds
 const SRI_LANKA_BOUNDS = {
@@ -56,8 +86,11 @@ const SRI_LANKA_CENTER = {
 
 export const CreateTripScreen: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const preSelectedDestination = location.state?.destination as Destination | undefined;
+  
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<typeof SRI_LANKA_DESTINATIONS>([]);
+  const [suggestions, setSuggestions] = useState<typeof ALL_DESTINATIONS>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ name: string; lat: number; lng: number } | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -230,6 +263,27 @@ export const CreateTripScreen: React.FC = () => {
     };
   }, [initializeMap]);
 
+  // Handle pre-selected destination from navigation state
+  useEffect(() => {
+    if (preSelectedDestination && mapLoaded && leafletMapRef.current) {
+      const destLocation = {
+        name: preSelectedDestination.name,
+        lat: preSelectedDestination.coordinates.latitude,
+        lng: preSelectedDestination.coordinates.longitude
+      };
+      
+      // Set the search query and selected location
+      setSearchQuery(preSelectedDestination.name);
+      setSelectedLocation(destLocation);
+      
+      // Add marker to map
+      addMarker(destLocation.lat, destLocation.lng, destLocation.name);
+      
+      // Zoom in on selected location
+      leafletMapRef.current.setView([destLocation.lat, destLocation.lng], 12);
+    }
+  }, [preSelectedDestination, mapLoaded, addMarker]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -240,10 +294,10 @@ export const CreateTripScreen: React.FC = () => {
       return;
     }
 
-    // Filter destinations based on search query
-    const filtered = SRI_LANKA_DESTINATIONS.filter(destination =>
+    // Filter destinations based on search query - show all matches
+    const filtered = ALL_DESTINATIONS.filter(destination =>
       destination.name.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); // Show max 5 suggestions
+    );
 
     setSuggestions(filtered);
     setShowSuggestions(true);

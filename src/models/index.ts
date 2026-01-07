@@ -31,6 +31,8 @@ export interface Destination {
   name: string;
   country: string;
   image: string;
+  images?: string[]; // Multiple images for detail view
+  address?: string; // Physical address
   description: string;
   coordinates: Coordinates;
   rating: number;
