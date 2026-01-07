@@ -76,13 +76,7 @@ export const mockDestinations: Destination[] = [
     name: 'Sigiriya',
     country: 'Dambulla',
     image: 'https://res.cloudinary.com/jerrick/image/upload/d_642250b563292b35f27461a7.png,f_jpg,fl_progressive,q_auto,w_1024/65564eabecaa89001dc39525.jpg',
-    images: [
-      'https://res.cloudinary.com/jerrick/image/upload/d_642250b563292b35f27461a7.png,f_jpg,fl_progressive,q_auto,w_1024/65564eabecaa89001dc39525.jpg',
-      'https://d104tpg70nvstz.cloudfront.net/sites/2/2024/08/Sigiriya-Uncovered-Delving-into-the-History-Art-and-Legends-800x609-1.jpg',
-      'https://chasinggambozinos.com/wp-content/uploads/climb-sigiriya-rock.jpg'
-    ],
-    address: 'Sigiriya Rock Fortress, Sigiriya 21120, Sri Lanka',
-    description: 'Rising dramatically from the jungle, Sigiriya is an ancient rock fortress crowned with royal ruins, breathtaking views, and timeless frescoes - a true wonder of Sri Lanka.',
+    description: 'Tropical paradise with stunning temples, rice terraces, and vibrant culture.',
     coordinates: { latitude: 7.9570, longitude: 80.6520 },
     rating: 9.5,
     popularActivities: ['Rock Fortress', 'neighboring Pidurangala rock for sun rise view', 'Wild Life Safari', 'Visits to Dambulla Cave Temple'],
@@ -95,13 +89,7 @@ export const mockDestinations: Destination[] = [
     name: 'Nine Arch bridge',
     country: 'Ella',
     image: 'https://www.orienthotelsl.com/wp-content/uploads/2023/01/Nine-Arch-Bridge-Ella-1200x630-1.jpg',
-    images: [
-      'https://www.orienthotelsl.com/wp-content/uploads/2023/01/Nine-Arch-Bridge-Ella-1200x630-1.jpg',
-      'https://www.laurewanders.com/wp-content/uploads/2023/11/Nine-Arch-Bridge-Ella-00006.jpg',
-      'https://www.greenholidaytravels.com/wp-content/uploads/2025/11/DSC03623-2-scaled-1-1024x768.webp'
-    ],
-    address: 'Nine Arch Bridge, Demodara Road, Ella 90090, Sri Lanka',
-    description: 'Hidden among misty tea plantations, the Nine Arch Bridge is a stunning colonial-era masterpiece where trains glide through lush green hills.',
+    description: 'A mesmerizing blend of ancient tradition and cutting-edge technology.',
     coordinates: { latitude: 6.8731, longitude: 81.0416 },
     rating: 9.0,
     popularActivities: ['colonial architecture', 'hiking through scenic routes', 'exploring nearby waterfalls', 'taking iconic photos'],
@@ -114,13 +102,7 @@ export const mockDestinations: Destination[] = [
     name: 'Galle Fort',
     country: 'Galle',
     image: 'https://do6raq9h04ex.cloudfront.net/sites/8/2021/07/galle-fort-1050x700-1.jpg',
-    images: [
-      'https://do6raq9h04ex.cloudfront.net/sites/8/2021/07/galle-fort-1050x700-1.jpg',
-      'https://slrailwayforum.com/content/images/2023/04/Galle-Fort.jpg',
-      'https://media.tacdn.com/media/attractions-splice-spp-674x446/0b/16/cc/41.jpg'
-    ],
-    address: 'Church Street, Galle Fort, Galle 80000, Sri Lanka',
-    description: 'A charming blend of history and coastal beauty, Galle Fort features cobbled streets, colonial architecture, and ocean views shaped by centuries of trade and culture.',
+    description: 'Architectural marvels, Mediterranean beaches, and incredible nightlife.',
     coordinates: { latitude: 6.0305, longitude: 80.2170 },
     rating: 8.5,
     popularActivities: ['Sagrada Familia', 'Beach days', 'Tapas tours', 'La Rambla strolls'],
@@ -133,13 +115,7 @@ export const mockDestinations: Destination[] = [
     name: 'Mirissa Beach',
     country: 'Sri Lanka',
     image: 'https://bhlankatours.com/wp-content/uploads/2024/01/Mirissa-820x520-1.jpg',
-    images: [
-      'https://bhlankatours.com/wp-content/uploads/2024/01/Mirissa-820x520-1.jpg',
-      'https://travelrebels.com/wp-content/uploads/2024/03/secret-beach-mirissa-1.jpg',
-      'https://static.vecteezy.com/system/resources/previews/045/959/299/large_2x/beautiful-colorful-sunset-on-the-beach-mirissa-beach-sri-lanka-photo.jpg'
-    ],
-    address: 'Mirissa Beach, Matara 81740, Sri Lanka',
-    description: 'With golden sands, turquoise waters, and epic sunsets, Mirissa Beach is the perfect tropical escape—famous for whale watching and laid-back vibes.',
+    description: 'Beautiful beach known for its golden sands, clear waters, and vibrant marine life.',
     coordinates: { latitude: 5.9483, longitude: 80.4716},
     rating: 7.5,
     popularActivities: ['Whale watching', 'Surfing', 'Beach parties', 'Seafood dining'],
@@ -152,13 +128,7 @@ export const mockDestinations: Destination[] = [
     name: 'Anuradhapura',
     country: 'Sri Lanka',
     image: 'https://d1bv4heaa2n05k.cloudfront.net/user-images/1533888386047/shutterstock-307224302_destinationMain_1533888398803.jpeg',
-    images: [
-      'https://d1bv4heaa2n05k.cloudfront.net/user-images/1533888386047/shutterstock-307224302_destinationMain_1533888398803.jpeg',
-      'https://travelrebels.com/wp-content/uploads/2018/06/anuradhapura-sunset.jpg',
-      'https://www.talesofceylon.com/wp-content/uploads/2020/04/Anuradhapura-Tale-800x520-1.jpg'
-    ],
-    address: 'Sacred City of Anuradhapura, Anuradhapura 50000, Sri Lanka',
-    description: 'One of the world oldest living cities, Anuradhapura is a sacred land of ancient stupas, serene monasteries, and deep spiritual heritage.',
+    description: 'Ancient city with well-preserved ruins, stupas, and sacred sites.',
     coordinates: { latitude: 8.3114, longitude: 80.4037},
     rating: 4.85,
     popularActivities: ['Exploring ancient ruins', 'Visiting sacred temples', 'Cycling tours', 'Wildlife spotting in nearby parks'],
@@ -171,13 +141,7 @@ export const mockDestinations: Destination[] = [
     name: 'Polonnaruwa',
     country: 'Sri Lanka',
     image: 'https://media-cdn.tripadvisor.com/media/photo-s/1a/a8/88/4e/polonnaruwa-famous-for.jpg',
-    images: [
-      'https://media-cdn.tripadvisor.com/media/photo-s/1a/a8/88/4e/polonnaruwa-famous-for.jpg',
-      'https://www.onthegotours.com/repository/ThePolonnaruwaVatadage-857341721661428.jpg',
-      'https://www.travellankaconnection.com/images/destinations/gallery_Polonnaruwa.jpg'
-    ],
-    address: 'Ancient City of Polonnaruwa, Polonnaruwa 51000, Sri Lanka',
-    description: 'A beautifully preserved medieval capital, Polonnaruwa showcases majestic stone temples, royal palaces, and impressive ancient engineering.',
+    description: 'Historic city with impressive ruins, ancient temples, and beautiful landscapes.',
     coordinates: { latitude:7.9147 , longitude: 81.0000 },
     rating: 4.9,
     popularActivities: ['Exploring ancient ruins', 'Visiting temples and statues', 'Cycling tours', 'Wildlife spotting in nearby parks'],

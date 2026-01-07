@@ -12,12 +12,13 @@ import { TripCard } from '@/components/travel/TripCard';
 import { MatchCard } from '@/components/travel/MatchCard';
 import { tripService } from '@/services/trip.service';
 import { matchingService } from '@/services/matching.service';
-import { currentUser } from '@/services/mock.data';
-import { Destination, Trip, Match } from '@/models';
+import { authService } from '@/services/auth.service';
+import { Destination, Trip, Match, User } from '@/models';
 import { cn } from '@/lib/utils';
 
 export const HomeScreen: React.FC = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -29,6 +30,10 @@ export const HomeScreen: React.FC = () => {
 
   const loadData = async () => {
     try {
+      // Fetch current user from API
+      const currentUser = await authService.fetchCurrentUser();
+      setUser(currentUser);
+
       const [destData, tripData, matchData] = await Promise.all([
         tripService.getPopularDestinations(6),
         tripService.getUpcomingTrips(3),
@@ -50,7 +55,7 @@ export const HomeScreen: React.FC = () => {
       <Header 
         showProfile 
         showNotifications 
-        user={{ name: currentUser.name, avatar: currentUser.avatar }}
+        user={user ? { name: user.name, avatar: user.avatar } : undefined}
         notificationCount={2}
       />
       
@@ -71,7 +76,7 @@ export const HomeScreen: React.FC = () => {
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-3 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <Card variant="gradient" className="p-3 text-center">
-            <p className="text-2xl font-bold text-gradient-sunset">{currentUser.tripsCompleted}</p>
+            <p className="text-2xl font-bold text-gradient-sunset">{user?.tripsCompleted || 0}</p>
             <p className="text-xs text-muted-foreground">Trips</p>
           </Card>
           <Card variant="gradient" className="p-3 text-center">
@@ -79,7 +84,7 @@ export const HomeScreen: React.FC = () => {
             <p className="text-xs text-muted-foreground">Matches</p>
           </Card>
           <Card variant="gradient" className="p-3 text-center">
-            <p className="text-2xl font-bold text-forest">{currentUser.rating}</p>
+            <p className="text-2xl font-bold text-forest">{user?.rating || 0}</p>
             <p className="text-xs text-muted-foreground">Rating</p>
           </Card>
         </div>

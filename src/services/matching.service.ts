@@ -1,5 +1,5 @@
 import { User, Match, MatchStatus } from '@/models';
-import { mockMatches, mockUsers, currentUser } from './mock.data';
+import { apiService } from './api.service';
 
 export interface MatchFilters {
   interests?: string[];
@@ -11,14 +11,24 @@ export interface MatchFilters {
 export const matchingService = {
   // Get all matches for current user
   async getMatches(): Promise<Match[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return mockMatches;
+    try {
+      const response = await apiService.matches.getAll();
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      return [];
+    }
   },
 
   // Get match by ID
   async getMatchById(matchId: string): Promise<Match | null> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockMatches.find(m => m.id === matchId) || null;
+    try {
+      const response = await apiService.matches.getById(matchId);
+      return response.data || null;
+    } catch (error) {
+      console.error('Error fetching match:', error);
+      return null;
+    }
   },
 
   // Calculate compatibility between two users
@@ -67,56 +77,24 @@ export const matchingService = {
 
   // Find potential matches
   async findMatches(filters?: MatchFilters): Promise<Match[]> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    let potentialUsers = mockUsers.filter(u => u.id !== currentUser.id);
-    
-    // Apply filters
-    if (filters?.interests?.length) {
-      potentialUsers = potentialUsers.filter(u => 
-        u.interests.some(i => filters.interests!.includes(i))
-      );
+    try {
+      const response = await apiService.matches.find(filters);
+      return response.data || [];
+    } catch (error) {
+      console.error('Error finding matches:', error);
+      return [];
     }
-    
-    if (filters?.travelStyles?.length) {
-      potentialUsers = potentialUsers.filter(u => 
-        filters.travelStyles!.includes(u.travelStyle)
-      );
-    }
-    
-    if (filters?.minCompatibility) {
-      potentialUsers = potentialUsers.filter(u => 
-        this.calculateCompatibility(currentUser, u) >= filters.minCompatibility!
-      );
-    }
-    
-    // Generate matches
-    const matches: Match[] = potentialUsers.map((user, index) => ({
-      id: 'match_' + user.id,
-      user,
-      compatibilityScore: this.calculateCompatibility(currentUser, user),
-      sharedInterests: currentUser.interests.filter(i => user.interests.includes(i)),
-      sharedDestinations: [], // Would come from user preferences
-      matchedTrips: [],
-      status: 'pending' as MatchStatus,
-      matchedAt: new Date()
-    }));
-    
-    // Sort by compatibility
-    return matches.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
   },
 
   // Update match status
   async updateMatchStatus(matchId: string, status: MatchStatus): Promise<Match | null> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    const match = mockMatches.find(m => m.id === matchId);
-    if (match) {
-      match.status = status;
-      return match;
+    try {
+      const response = await apiService.matches.updateStatus(matchId, status);
+      return response.data || null;
+    } catch (error) {
+      console.error('Error updating match status:', error);
+      return null;
     }
-    
-    return null;
   },
 
   // Accept a match
@@ -129,3 +107,4 @@ export const matchingService = {
     return this.updateMatchStatus(matchId, 'declined');
   }
 };
+

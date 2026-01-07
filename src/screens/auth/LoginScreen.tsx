@@ -39,12 +39,11 @@ export const LoginScreen: React.FC = () => {
     <div className="min-h-screen bg-gradient-hero flex flex-col">
       {/* Hero Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-8">
-          <img 
-            src="/logo.png" 
-            alt="Travel Buddy" 
-            style={{ width: '320px', height: '320px', maxWidth: '320px', maxHeight: '320px', minWidth: '320px', minHeight: '320px' }}
-            className="object-contain drop-shadow-2xl mb-6"
-          />
+        <div className="animate-float mb-6">
+          <div className="h-20 w-20 rounded-2xl bg-gradient-sunset flex items-center justify-center shadow-glow">
+            <Plane className="h-10 w-10 text-primary-foreground" />
+          </div>
+        </div>
         
         <h1 className="font-display text-3xl font-bold text-foreground text-center">
           Welcome Back

@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, MapPin, User, Mail, Check } from 'lucide-react';
+import { ArrowLeft, Camera, MapPin, User as UserIcon, Mail, Check } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Card } from '@/components/common/Card';
 import { Avatar } from '@/components/common/Avatar';
 import { Badge } from '@/components/common/Badge';
 import { authService } from '@/services/auth.service';
-import { TravelStyle } from '@/models';
+import { TravelStyle, User } from '@/models';
 import { cn } from '@/lib/utils';
 
 const interests = [
@@ -33,23 +33,43 @@ const languages = [
 
 export const EditProfileScreen: React.FC = () => {
   const navigate = useNavigate();
-  const currentUser = authService.getCurrentUser();
+  const [user, setUser] = useState<User | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  const [name, setName] = useState(currentUser?.name || '');
-  const [email, setEmail] = useState(currentUser?.email || '');
-  const [location, setLocation] = useState(currentUser?.location || '');
-  const [bio, setBio] = useState(currentUser?.bio || '');
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(
-    currentUser?.interests || []
-  );
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    currentUser?.languages || []
-  );
-  const [selectedStyle, setSelectedStyle] = useState<TravelStyle>(
-    currentUser?.travelStyle || 'adventure'
-  );
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState('');
+  const [bio, setBio] = useState('');
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedStyle, setSelectedStyle] = useState<TravelStyle>('adventure');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    // Fetch current user from API on mount
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = await authService.fetchCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        setName(currentUser.name || '');
+        setEmail(currentUser.email || '');
+        setLocation(currentUser.location || '');
+        setBio(currentUser.bio || '');
+        setSelectedInterests(currentUser.interests || []);
+        setSelectedLanguages(currentUser.languages || []);
+        setSelectedStyle(currentUser.travelStyle || 'adventure');
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    } finally {
+      setInitialLoading(false);
+    }
+  };
 
   const toggleInterest = (interest: string) => {
     setSelectedInterests(prev => 
@@ -69,11 +89,17 @@ export const EditProfileScreen: React.FC = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user?.id) {
+      console.error('No user ID available');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Update user profile
-      await authService.updateProfile({
+      // Update user profile with userId
+      await authService.updateProfile(user.id, {
         name,
         email,
         location,
@@ -95,6 +121,14 @@ export const EditProfileScreen: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-8">
@@ -123,10 +157,10 @@ export const EditProfileScreen: React.FC = () => {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <Avatar
-                  src={currentUser?.avatar}
+                  src={user?.avatar}
                   alt={name}
                   size="2xl"
-                  verificationStatus={currentUser?.verificationStatus}
+                  verificationStatus={user?.verificationStatus}
                   showBadge
                 />
                 <button 
@@ -155,7 +189,7 @@ export const EditProfileScreen: React.FC = () => {
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                icon={User}
+                icon={UserIcon}
                 variant="filled"
                 required
               />

@@ -19,18 +19,28 @@ import { User } from '@/models';
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get current user on mount and when returning from edit
-    const currentUser = authService.getCurrentUser();
-    setUser(currentUser);
+    // Fetch current user from API on mount
+    loadUserData();
   }, []);
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = await authService.fetchCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Error loading user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Refresh user data when coming back to this screen
   useEffect(() => {
     const handleFocus = () => {
-      const currentUser = authService.getCurrentUser();
-      setUser(currentUser);
+      loadUserData();
     };
     
     window.addEventListener('focus', handleFocus);
@@ -42,7 +52,7 @@ export const ProfileScreen: React.FC = () => {
     navigate('/login');
   };
 
-  if (!user) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>

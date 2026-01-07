@@ -1,5 +1,5 @@
 import { Trip, Destination, TripStatus, BudgetRange, ItineraryItem } from '@/models';
-import { mockTrips, mockDestinations, currentUser } from './mock.data';
+import { apiService } from './api.service';
 
 export interface TripFilters {
   destination?: string;
@@ -26,173 +26,149 @@ export interface CreateTripData {
 export const tripService = {
   // Get all trips
   async getTrips(filters?: TripFilters): Promise<Trip[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let trips = [...mockTrips];
-    
-    if (filters?.destination) {
-      trips = trips.filter(t => 
-        t.destination.name.toLowerCase().includes(filters.destination!.toLowerCase())
-      );
+    try {
+      const response = await apiService.trips.getAll(filters);
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching trips:', error);
+      return [];
     }
-    
-    if (filters?.status) {
-      trips = trips.filter(t => t.status === filters.status);
-    }
-    
-    if (filters?.budgetMax) {
-      trips = trips.filter(t => t.budget.max <= filters.budgetMax!);
-    }
-    
-    return trips;
   },
 
   // Get trip by ID
   async getTripById(tripId: string): Promise<Trip | null> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockTrips.find(t => t.id === tripId) || null;
+    try {
+      const response = await apiService.trips.getById(tripId);
+      return response.data || null;
+    } catch (error) {
+      console.error('Error fetching trip:', error);
+      return null;
+    }
   },
 
   // Get user's trips
   async getUserTrips(userId?: string): Promise<Trip[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const uid = userId || currentUser.id;
-    
-    return mockTrips.filter(t => 
-      t.organizer.id === uid || t.currentCompanions.some(c => c.id === uid)
-    );
+    try {
+      const response = await apiService.trips.getAll({ userId });
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching user trips:', error);
+      return [];
+    }
   },
 
   // Get all destinations
   async getDestinations(): Promise<Destination[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return mockDestinations;
+    try {
+      const response = await apiService.destinations.getAll();
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching destinations:', error);
+      return [];
+    }
   },
 
   // Get destination by ID
   async getDestinationById(destinationId: string): Promise<Destination | null> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    return mockDestinations.find(d => d.id === destinationId) || null;
+    try {
+      const response = await apiService.destinations.getById(destinationId);
+      return response.data || null;
+    } catch (error) {
+      console.error('Error fetching destination:', error);
+      return null;
+    }
   },
 
   // Search destinations
   async searchDestinations(query: string): Promise<Destination[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const lowercaseQuery = query.toLowerCase();
-    return mockDestinations.filter(d => 
-      d.name.toLowerCase().includes(lowercaseQuery) ||
-      d.country.toLowerCase().includes(lowercaseQuery) ||
-      d.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
-    );
+    try {
+      const response = await apiService.destinations.search(query);
+      return response.data || [];
+    } catch (error) {
+      console.error('Error searching destinations:', error);
+      return [];
+    }
   },
 
   // Create a new trip
   async createTrip(data: CreateTripData): Promise<Trip> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const destination = mockDestinations.find(d => d.id === data.destinationId);
-    if (!destination) {
-      throw new Error('Destination not found');
+    try {
+      const response = await apiService.trips.create(data);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error || 'Failed to create trip');
+    } catch (error: any) {
+      console.error('Error creating trip:', error);
+      throw new Error(error.response?.data?.error || error.message || 'Failed to create trip');
     }
-    
-    const newTrip: Trip = {
-      id: 'trip_' + Date.now(),
-      title: data.title,
-      destination,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      budget: data.budget,
-      maxCompanions: data.maxCompanions,
-      currentCompanions: [],
-      organizer: currentUser,
-      description: data.description,
-      activities: data.activities,
-      status: 'open',
-      isPublic: data.isPublic,
-      itinerary: []
-    };
-    
-    mockTrips.push(newTrip);
-    return newTrip;
   },
 
   // Join a trip
   async joinTrip(tripId: string): Promise<Trip | null> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const trip = mockTrips.find(t => t.id === tripId);
-    if (!trip) return null;
-    
-    if (trip.currentCompanions.length >= trip.maxCompanions) {
-      throw new Error('Trip is full');
+    try {
+      const response = await apiService.trips.join(tripId);
+      return response.data || null;
+    } catch (error: any) {
+      console.error('Error joining trip:', error);
+      throw new Error(error.response?.data?.error || error.message || 'Failed to join trip');
     }
-    
-    if (!trip.currentCompanions.some(c => c.id === currentUser.id)) {
-      trip.currentCompanions.push(currentUser);
-    }
-    
-    if (trip.currentCompanions.length >= trip.maxCompanions) {
-      trip.status = 'full';
-    }
-    
-    return trip;
   },
 
   // Leave a trip
   async leaveTrip(tripId: string): Promise<Trip | null> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    const trip = mockTrips.find(t => t.id === tripId);
-    if (!trip) return null;
-    
-    trip.currentCompanions = trip.currentCompanions.filter(c => c.id !== currentUser.id);
-    
-    if (trip.status === 'full') {
-      trip.status = 'open';
+    try {
+      const response = await apiService.trips.leave(tripId);
+      return response.data || null;
+    } catch (error: any) {
+      console.error('Error leaving trip:', error);
+      throw new Error(error.response?.data?.error || error.message || 'Failed to leave trip');
     }
-    
-    return trip;
   },
 
   // Add itinerary item
   async addItineraryItem(tripId: string, item: Omit<ItineraryItem, 'id'>): Promise<ItineraryItem> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const trip = mockTrips.find(t => t.id === tripId);
-    if (!trip) {
-      throw new Error('Trip not found');
+    try {
+      // Note: Assuming API has this endpoint
+      const response = await apiService.trips.update(tripId, { 
+        itinerary: item 
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error adding itinerary item:', error);
+      throw new Error(error.response?.data?.error || error.message || 'Failed to add itinerary item');
     }
-    
-    const newItem: ItineraryItem = {
-      ...item,
-      id: 'item_' + Date.now()
-    };
-    
-    if (!trip.itinerary) {
-      trip.itinerary = [];
-    }
-    
-    trip.itinerary.push(newItem);
-    return newItem;
   },
 
   // Get popular destinations
   async getPopularDestinations(limit: number = 6): Promise<Destination[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return mockDestinations
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, limit);
+    try {
+      const response = await apiService.destinations.getAll();
+      const destinations = response.data || [];
+      return destinations
+        .sort((a: Destination, b: Destination) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching popular destinations:', error);
+      return [];
+    }
   },
 
   // Get upcoming trips
   async getUpcomingTrips(limit: number = 5): Promise<Trip[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const now = new Date();
-    
-    return mockTrips
-      .filter(t => t.startDate > now && t.status === 'open')
-      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
-      .slice(0, limit);
+    try {
+      const response = await apiService.trips.getAll({ status: 'open' });
+      const trips = response.data || [];
+      const now = new Date();
+      
+      return trips
+        .filter((t: Trip) => new Date(t.startDate) > now)
+        .sort((a: Trip, b: Trip) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching upcoming trips:', error);
+      return [];
+    }
   }
 };
+
