@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Destination } from '@/models';
 import { Card } from '@/components/common/Card';
 import { Badge } from '@/components/common/Badge';
-import { MapPin, Star, Calendar } from 'lucide-react';
+import { MapPin, Star, Calendar, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { favoritesService } from '@/services/favorites.service';
 
 interface DestinationCardProps {
   destination: Destination;
@@ -20,6 +21,17 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
   className,
   style
 }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    setIsFavorite(favoritesService.isFavorite(destination.id));
+  }, [destination.id]);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newState = favoritesService.toggleFavorite(destination);
+    setIsFavorite(newState);
+  };
   const costColors = {
     budget: 'success',
     moderate: 'info',
@@ -33,13 +45,32 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
         variant="interactive" 
         className={cn("overflow-hidden", className)}
         onClick={onClick}
+        style={style}
       >
         <div className="flex gap-3 p-3">
-          <img
-            src={destination.image}
-            alt={destination.name}
-            className="h-16 w-16 rounded-xl object-cover"
-          />
+          <div className="relative">
+            <img
+              src={destination.image}
+              alt={destination.name}
+              className="h-16 w-16 rounded-xl object-cover"
+            />
+            {/* Favorite Button */}
+            <button
+              onClick={handleFavoriteClick}
+              className={cn(
+                "absolute -top-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center transition-all",
+                "bg-background shadow-md hover:scale-110",
+                isFavorite ? "text-red-500" : "text-muted-foreground"
+              )}
+            >
+              <Heart 
+                className={cn(
+                  "h-3 w-3 transition-all",
+                  isFavorite && "fill-current"
+                )} 
+              />
+            </button>
+          </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-display font-semibold text-foreground truncate">
               {destination.name}
@@ -64,6 +95,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
         variant="interactive" 
         className={cn("overflow-hidden group", className)}
         onClick={onClick}
+        style={style}
       >
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
@@ -80,6 +112,23 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
               </Badge>
             ))}
           </div>
+
+          {/* Favorite Button */}
+          <button
+            onClick={handleFavoriteClick}
+            className={cn(
+              "absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center transition-all",
+              "bg-background/80 backdrop-blur-sm hover:scale-110",
+              isFavorite ? "text-red-500" : "text-muted-foreground"
+            )}
+          >
+            <Heart 
+              className={cn(
+                "h-4 w-4 transition-all",
+                isFavorite && "fill-current"
+              )} 
+            />
+          </button>
           
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="flex items-center gap-1 text-sunset mb-1">
@@ -105,6 +154,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
       variant="interactive" 
       className={cn("overflow-hidden group", className)}
       onClick={onClick}
+      style={style}
     >
       <div className="relative aspect-video overflow-hidden">
         <img
@@ -114,11 +164,28 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-night/60 to-transparent" />
         
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex gap-2">
           <Badge variant={costColors[destination.averageCost]}>
             {destination.averageCost}
           </Badge>
         </div>
+
+        {/* Favorite Button */}
+        <button
+          onClick={handleFavoriteClick}
+          className={cn(
+            "absolute top-3 left-3 h-8 w-8 rounded-full flex items-center justify-center transition-all",
+            "bg-background/80 backdrop-blur-sm hover:scale-110",
+            isFavorite ? "text-red-500" : "text-muted-foreground"
+          )}
+        >
+          <Heart 
+            className={cn(
+              "h-4 w-4 transition-all",
+              isFavorite && "fill-current"
+            )} 
+          />
+        </button>
       </div>
       
       <div className="p-4">

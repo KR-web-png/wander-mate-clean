@@ -2,24 +2,26 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Map, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NavItem {
   icon: React.ElementType;
-  label: string;
+  labelKey: string;
   path: string;
 }
 
 const navItems: NavItem[] = [
-  { icon: Home, label: 'Home', path: '/home' },
-  { icon: Search, label: 'Discover', path: '/discover' },
-  { icon: Map, label: 'Trips', path: '/trips' },
-  { icon: MessageCircle, label: 'Chat', path: '/chat' },
-  { icon: User, label: 'Profile', path: '/profile' },
+  { icon: Home, labelKey: 'nav.home', path: '/home' },
+  { icon: Search, labelKey: 'nav.discover', path: '/discover' },
+  { icon: Map, labelKey: 'nav.trips', path: '/trips' },
+  { icon: MessageCircle, labelKey: 'nav.chat', path: '/chat' },
+  { icon: User, labelKey: 'nav.profile', path: '/profile' },
 ];
 
 export const BottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/50 px-2 pb-safe">
@@ -56,7 +58,7 @@ export const BottomNav: React.FC = () => {
                 "text-[10px] mt-1 font-medium transition-opacity duration-200",
                 isActive ? "opacity-100" : "opacity-70"
               )}>
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </button>
           );

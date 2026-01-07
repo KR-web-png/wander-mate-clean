@@ -22,6 +22,13 @@ import { MatchesScreen } from "@/screens/matches/MatchesScreen";
 import { ChatScreen } from "@/screens/chat/ChatScreen";
 import { ProfileScreen } from "@/screens/profile/ProfileScreen";
 import { EditProfileScreen } from "@/screens/profile/EditProfileScreen";
+import { LanguagesScreen } from "@/screens/profile/LanguagesScreen";
+import { NotificationsScreen } from "@/screens/profile/NotificationsScreen";
+import { SafetyPrivacyScreen } from "@/screens/profile/SafetyPrivacyScreen";
+import { MyInterestsScreen } from "@/screens/profile/MyInterestsScreen";
+
+// Contexts
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 import NotFound from "./pages/NotFound";
 
@@ -29,10 +36,11 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <LanguageProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
         <Routes>
           {/* Splash Screen - First screen */}
           <Route path="/" element={<SplashScreen />} />
@@ -52,12 +60,17 @@ const App = () => (
           <Route path="/chat" element={<ChatScreen />} />
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/profile/edit" element={<EditProfileScreen />} />
+          <Route path="/profile/interests" element={<MyInterestsScreen />} />
+          <Route path="/profile/languages" element={<LanguagesScreen />} />
+          <Route path="/notifications" element={<NotificationsScreen />} />
+          <Route path="/profile/safety" element={<SafetyPrivacyScreen />} />
           
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 

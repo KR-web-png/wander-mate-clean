@@ -14,16 +14,23 @@ import { Badge } from '@/components/common/Badge';
 import { authService } from '@/services/auth.service';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { User } from '@/models';
+import { User, Destination } from '@/models';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { favoritesService } from '@/services/favorites.service';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const { t } = useLanguage();
+  const [favoriteDestinations, setFavoriteDestinations] = useState<Destination[]>([]);
 
   useEffect(() => {
     // Get current user on mount and when returning from edit
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
+    
+    // Load favorite destinations
+    setFavoriteDestinations(favoritesService.getFavorites());
   }, []);
 
   // Refresh user data when coming back to this screen
@@ -31,6 +38,9 @@ export const ProfileScreen: React.FC = () => {
     const handleFocus = () => {
       const currentUser = authService.getCurrentUser();
       setUser(currentUser);
+      
+      // Refresh favorite destinations
+      setFavoriteDestinations(favoritesService.getFavorites());
     };
     
     window.addEventListener('focus', handleFocus);
@@ -51,16 +61,15 @@ export const ProfileScreen: React.FC = () => {
   }
 
   const menuItems = [
-    { icon: Edit2, label: 'Edit Profile', path: '/profile/edit' },
-    { icon: Heart, label: 'My Interests', path: '/profile/interests' },
-    { icon: Globe, label: 'Languages', path: '/profile/languages' },
-    { icon: Shield, label: 'Safety & Privacy', path: '/profile/safety' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: Edit2, label: t('profile.editProfile'), path: '/profile/edit' },
+    { icon: Heart, label: t('profile.myInterests'), path: '/profile/interests' },
+    { icon: Globe, label: t('profile.languages'), path: '/profile/languages' },
+    { icon: Shield, label: t('profile.safetyPrivacy'), path: '/profile/safety' },
   ];
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <Header title="Profile" showSettings />
+      <Header title={t('profile.title')} showNotifications notificationCount={3} />
       
       <main className="pt-20 px-4 max-w-lg mx-auto">
         {/* Profile Header */}
@@ -96,12 +105,12 @@ export const ProfileScreen: React.FC = () => {
               >
                 <Shield className="h-3 w-3 mr-1" />
                 {user.verificationStatus === 'fully_verified' 
-                  ? 'Verified' 
-                  : 'ID Verified'}
+                  ? t('profile.verified')
+                  : t('profile.idVerified')}
               </Badge>
               <Badge variant="outline">
                 <Calendar className="h-3 w-3 mr-1" />
-                Joined {format(user.joinedDate, 'MMM yyyy')}
+                {t('profile.joined')} {format(user.joinedDate, 'MMM yyyy')}
               </Badge>
             </div>
           </div>
@@ -119,17 +128,17 @@ export const ProfileScreen: React.FC = () => {
           <Card variant="gradient" className="p-4 text-center">
             <Award className="h-5 w-5 mx-auto text-sunset mb-1" />
             <p className="text-xl font-bold text-foreground">{user.tripsCompleted || 0}</p>
-            <p className="text-xs text-muted-foreground">Trips</p>
+            <p className="text-xs text-muted-foreground">{t('profile.trips')}</p>
           </Card>
           <Card variant="gradient" className="p-4 text-center">
             <Star className="h-5 w-5 mx-auto text-sunset fill-sunset mb-1" />
             <p className="text-xl font-bold text-foreground">{user.rating || 0}</p>
-            <p className="text-xs text-muted-foreground">Rating</p>
+            <p className="text-xs text-muted-foreground">{t('profile.rating')}</p>
           </Card>
           <Card variant="gradient" className="p-4 text-center">
             <Globe className="h-5 w-5 mx-auto text-ocean mb-1" />
             <p className="text-xl font-bold text-foreground">{user.languages?.length || 0}</p>
-            <p className="text-xs text-muted-foreground">Languages</p>
+            <p className="text-xs text-muted-foreground">{t('profile.languages')}</p>
           </Card>
         </div>
 
@@ -138,7 +147,7 @@ export const ProfileScreen: React.FC = () => {
           <Card variant="gradient" className="p-4 mb-6 animate-fade-in"
                 style={{ animationDelay: '0.15s' }}>
             <h3 className="font-display font-semibold text-foreground mb-3">
-              Travel Style
+              {t('profile.travelStyle')}
             </h3>
             <Badge variant="premium" size="lg" className="capitalize">
               {user.travelStyle.replace('_', ' ')}
@@ -151,7 +160,7 @@ export const ProfileScreen: React.FC = () => {
           <Card variant="gradient" className="p-4 mb-6 animate-fade-in"
                 style={{ animationDelay: '0.2s' }}>
             <h3 className="font-display font-semibold text-foreground mb-3">
-              Interests
+              {t('profile.interests')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {user.interests.map(interest => (
@@ -163,12 +172,53 @@ export const ProfileScreen: React.FC = () => {
           </Card>
         )}
 
+        {/* Favorite Destinations */}
+        {favoriteDestinations.length > 0 && (
+          <Card variant="gradient" className="p-4 mb-6 animate-fade-in"
+                style={{ animationDelay: '0.225s' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
+                <Heart className="h-4 w-4 text-red-500 fill-current" />
+                Favorite Destinations
+              </h3>
+              <span className="text-xs text-muted-foreground">{favoriteDestinations.length}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {favoriteDestinations.slice(0, 4).map(destination => (
+                <button
+                  key={destination.id}
+                  onClick={() => navigate(`/destination/${destination.id}`)}
+                  className="relative rounded-xl overflow-hidden group"
+                >
+                  <img 
+                    src={destination.image} 
+                    alt={destination.name}
+                    className="w-full h-24 object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-night/80 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <p className="text-xs font-semibold text-white truncate">{destination.name}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            {favoriteDestinations.length > 4 && (
+              <button 
+                onClick={() => navigate('/discover')}
+                className="text-xs text-primary mt-3 hover:underline w-full text-center"
+              >
+                View all {favoriteDestinations.length} favorites
+              </button>
+            )}
+          </Card>
+        )}
+
         {/* Languages */}
         {user.languages && user.languages.length > 0 && (
           <Card variant="gradient" className="p-4 mb-6 animate-fade-in"
                 style={{ animationDelay: '0.25s' }}>
             <h3 className="font-display font-semibold text-foreground mb-3">
-              Languages
+              {t('profile.languages')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {user.languages.map(lang => (
@@ -209,7 +259,7 @@ export const ProfileScreen: React.FC = () => {
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Log Out
+          {t('profile.logout')}
         </Button>
       </main>
 
