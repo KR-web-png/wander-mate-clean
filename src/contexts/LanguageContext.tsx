@@ -17,7 +17,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.discover': 'Discover',
     'nav.trips': 'Trips',
     'nav.matches': 'Matches',
-    'nav.chat': 'Chat',
+    'nav.community': 'Community',
     'nav.profile': 'Profile',
     
     // Profile
@@ -71,7 +71,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.discover': 'සොයන්න',
     'nav.trips': 'ගමන්',
     'nav.matches': 'ගැලපීම්',
-    'nav.chat': 'කතාබස්',
+    'nav.community': 'ප්‍රජාව',
     'nav.profile': 'පැතිකඩ',
     
     // Profile
@@ -125,7 +125,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.discover': 'கண்டுபிடி',
     'nav.trips': 'பயணங்கள்',
     'nav.matches': 'பொருத்தங்கள்',
-    'nav.chat': 'அரட்டை',
+    'nav.community': 'சமூகம்',
     'nav.profile': 'சுயவிவரம்',
     
     // Profile

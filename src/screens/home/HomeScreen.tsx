@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, TrendingUp, Sparkles, ChevronRight, MapPin } from 'lucide-react';
+import { Search, TrendingUp, Sparkles, ChevronRight, MapPin, Users } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { Badge } from '@/components/common/Badge';
+import { Avatar } from '@/components/common/Avatar';
 import { DestinationCard } from '@/components/travel/DestinationCard';
 import { TripCard } from '@/components/travel/TripCard';
-import { MatchCard } from '@/components/travel/MatchCard';
 import { tripService } from '@/services/trip.service';
-import { matchingService } from '@/services/matching.service';
+import { travelMatesService } from '@/services/travelMates.service';
 import { currentUser } from '@/services/mock.data';
-import { Destination, Trip, Match } from '@/models';
+import { Destination, Trip, User } from '@/models';
 import { cn } from '@/lib/utils';
 
 export const HomeScreen: React.FC = () => {
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [matches, setMatches] = useState<Match[]>([]);
+  const [mates, setMates] = useState<Partial<User>[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,15 +30,25 @@ export const HomeScreen: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [destData, tripData, matchData] = await Promise.all([
+      const [destData, tripData] = await Promise.all([
         tripService.getPopularDestinations(6),
-        tripService.getUpcomingTrips(3),
-        matchingService.getMatches()
+        tripService.getUpcomingTrips(3)
       ]);
       
       setDestinations(destData);
       setTrips(tripData);
-      setMatches(matchData.slice(0, 3));
+      
+      // Load travel mates
+      const mateIds = travelMatesService.getTravelMates();
+      const mateProfiles = mateIds
+        .map(id => travelMatesService.getUserById(id))
+        .filter(Boolean)
+        .slice(0, 3);
+      setMates(mateProfiles);
+      
+      // Count incoming requests
+      const requests = travelMatesService.getIncomingRequests();
+      setIncomingRequests(requests.length);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -75,8 +86,8 @@ export const HomeScreen: React.FC = () => {
             <p className="text-xs text-muted-foreground">Trips</p>
           </Card>
           <Card variant="gradient" className="p-3 text-center">
-            <p className="text-2xl font-bold text-ocean">{matches.length}</p>
-            <p className="text-xs text-muted-foreground">Matches</p>
+            <p className="text-2xl font-bold text-ocean">{mates.length}</p>
+            <p className="text-xs text-muted-foreground">Mates</p>
           </Card>
           <Card variant="gradient" className="p-3 text-center">
             <p className="text-2xl font-bold text-forest">{currentUser.rating}</p>
@@ -119,35 +130,71 @@ export const HomeScreen: React.FC = () => {
           </section>
         )}
 
-        {/* New Matches */}
-        {matches.length > 0 && (
-          <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-sunset" />
-                New Matches
-              </h2>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/matches')}>
-                See All
-                <ChevronRight className="h-4 w-4 ml-1" />
+        {/* Travel Mates */}
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+              <Users className="h-5 w-5 text-sunset" />
+              Travel Mates
+              {incomingRequests > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {incomingRequests} new
+                </Badge>
+              )}
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/travel-mates')}>
+              See All
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+          
+          {mates.length === 0 ? (
+            <Card variant="gradient" className="p-8 text-center">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <h3 className="font-semibold text-foreground mb-2">
+                No Travel Mates Yet
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Connect with fellow travelers in the community
+              </p>
+              <Button variant="sunset" size="sm" onClick={() => navigate('/community')}>
+                Explore Community
               </Button>
-            </div>
-            
-            <div className="space-y-3">
-              {matches.slice(0, 2).map((match, index) => (
-                <MatchCard 
-                  key={match.id} 
-                  match={match} 
-                  variant="compact"
-                  onAccept={() => matchingService.acceptMatch(match.id)}
-                  onDecline={() => matchingService.declineMatch(match.id)}
-                  className="animate-fade-in"
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {mates.map((mate, index) => (
+                <Card
+                  key={mate.id}
+                  variant="elevated"
+                  className="p-4 animate-fade-in cursor-pointer hover:shadow-lg transition-all"
                   style={{ animationDelay: `${0.3 + index * 0.1}s` }}
-                />
+                  onClick={() => navigate(`/profile/${mate.id}`)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar src={mate.avatar} alt={mate.name} size="default" />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground truncate">
+                        {mate.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {mate.location}
+                      </p>
+                      <div className="flex gap-1 mt-1">
+                        {mate.interests?.slice(0, 2).map((interest: string) => (
+                          <Badge key={interest} variant="secondary" className="text-xs">
+                            {interest}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </Card>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* Trending Destinations */}
         <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>

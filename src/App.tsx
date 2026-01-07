@@ -19,13 +19,15 @@ import { DestinationDetailsScreen } from "@/screens/discover/DestinationDetailsS
 import { TripsScreen } from "@/screens/trips/TripsScreen";
 import { CreateTripScreen } from "@/screens/trips/CreateTripScreen";
 import { MatchesScreen } from "@/screens/matches/MatchesScreen";
-import { ChatScreen } from "@/screens/chat/ChatScreen";
+import { CommunityScreen } from "@/screens/community/CommunityScreen";
 import { ProfileScreen } from "@/screens/profile/ProfileScreen";
 import { EditProfileScreen } from "@/screens/profile/EditProfileScreen";
 import { LanguagesScreen } from "@/screens/profile/LanguagesScreen";
 import { NotificationsScreen } from "@/screens/profile/NotificationsScreen";
 import { SafetyPrivacyScreen } from "@/screens/profile/SafetyPrivacyScreen";
 import { MyInterestsScreen } from "@/screens/profile/MyInterestsScreen";
+import { UserProfileScreen } from "@/screens/profile/UserProfileScreen";
+import { TravelMatesScreen } from "@/screens/profile/TravelMatesScreen";
 
 // Contexts
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -57,11 +59,13 @@ const App = () => (
           <Route path="/trips" element={<TripsScreen />} />
           <Route path="/trips/create" element={<CreateTripScreen />} />
           <Route path="/matches" element={<MatchesScreen />} />
-          <Route path="/chat" element={<ChatScreen />} />
+          <Route path="/community" element={<CommunityScreen />} />
           <Route path="/profile" element={<ProfileScreen />} />
+          <Route path="/profile/:userId" element={<UserProfileScreen />} />
           <Route path="/profile/edit" element={<EditProfileScreen />} />
           <Route path="/profile/interests" element={<MyInterestsScreen />} />
           <Route path="/profile/languages" element={<LanguagesScreen />} />
+          <Route path="/travel-mates" element={<TravelMatesScreen />} />
           <Route path="/notifications" element={<NotificationsScreen />} />
           <Route path="/profile/safety" element={<SafetyPrivacyScreen />} />
           

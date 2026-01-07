@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Map, MessageCircle, User } from 'lucide-react';
+import { Home, Search, Map, Users, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,7 +14,7 @@ const navItems: NavItem[] = [
   { icon: Home, labelKey: 'nav.home', path: '/home' },
   { icon: Search, labelKey: 'nav.discover', path: '/discover' },
   { icon: Map, labelKey: 'nav.trips', path: '/trips' },
-  { icon: MessageCircle, labelKey: 'nav.chat', path: '/chat' },
+  { icon: Users, labelKey: 'nav.community', path: '/community' },
   { icon: User, labelKey: 'nav.profile', path: '/profile' },
 ];
 
